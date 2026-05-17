@@ -1,0 +1,174 @@
+/* Основни ресетирања за страницата */
+.landing-container {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #0f172a; /* Темен, модерен бекграунд */
+    color: #f8fafc;
+    min-height: 100vh;
+}
+
+/* Навигација */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 5%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.logo-icon {
+    color: #3b82f6;
+}
+
+.text-blue {
+    color: #3b82f6;
+}
+
+/* Копчиња */
+.btn-ghost {
+    color: #cbd5e1;
+    text-decoration: none;
+    margin-right: 20px;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.btn-ghost:hover {
+    color: #fff;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s, transform 0.2s;
+    margin-top: 0;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.large {
+    padding: 14px 28px;
+    font-size: 16px;
+}
+
+/* Hero Секција */
+.hero-section {
+    text-align: center;
+    padding: 100px 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-section h1 {
+    font-size: 56px;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    font-weight: 800;
+}
+
+.gradient-text {
+    background: linear-gradient(to right, #60a5fa, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-section p {
+    font-size: 18px;
+    color: #94a3b8;
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
+
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Картички (Features) */
+.features-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 50px 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 30px;
+    border-radius: 16px;
+    transition: transform 0.3s, background 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.icon-wrapper.blue {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+}
+
+.icon-wrapper.purple {
+    background: rgba(168, 85, 247, 0.2);
+    color: #c084fc;
+}
+
+.icon-wrapper.green {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+}
+
+.feature-card h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    color: #94a3b8;
+    line-height: 1.5;
+}
+

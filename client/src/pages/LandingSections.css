@@ -1,0 +1,333 @@
+/* =====================================================
+   КОПИРАЈ ГО ВАКОВ КОД НА КРАЈОТ ОД Landing.css
+   ===================================================== */
+
+/* ── STATS ─────────────────────────────────────────── */
+.stats-section {
+  padding: 60px 40px;
+  background: #151929;
+  border-top: 1px solid #1e2a45;
+  border-bottom: 1px solid #1e2a45;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 20px;
+  background: #1a2035;
+  border: 1px solid #1e2a45;
+  border-radius: 14px;
+  transition: border-color 0.25s, transform 0.25s;
+}
+
+.stat-card:hover {
+  border-color: #3b82f6;
+  transform: translateY(-4px);
+}
+
+.stat-number {
+  font-size: 42px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #7c6fcd, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #8892b0;
+  text-align: center;
+}
+
+/* ── SHARED SECTION STYLES ──────────────────────────── */
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-badge {
+  display: inline-block;
+  background: rgba(124, 111, 205, 0.15);
+  color: #7c6fcd;
+  border: 1px solid rgba(124, 111, 205, 0.3);
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 34px;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin: 0 0 14px;
+  line-height: 1.25;
+}
+
+.section-subtitle {
+  font-size: 16px;
+  color: #8892b0;
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ── TEAM PROGRESS ──────────────────────────────────── */
+.team-section {
+  padding: 90px 40px;
+  background: #0f1220;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  max-width: 960px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.member-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: #1a2035;
+  border: 1px solid #1e2a45;
+  border-radius: 12px;
+  transition: border-color 0.2s;
+}
+
+.member-row:hover { border-color: #3b82f6; }
+
+.member-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.member-info { flex: 1; }
+
+.member-name-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.member-name  { font-size: 14px; font-weight: 600; color: #e2e8f0; }
+.member-count { font-size: 12px; color: #8892b0; }
+
+.progress-track {
+  height: 6px;
+  background: #1e2a45;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease;
+}
+
+.member-pct {
+  font-size: 14px;
+  font-weight: 700;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Mini Kanban */
+.mini-kanban {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  background: #1a2035;
+  border: 1px solid #1e2a45;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.kanban-col { display: flex; flex-direction: column; gap: 8px; }
+
+.col-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #1e2a45;
+}
+
+.todo .col-label       { color: #8892b0; }
+.inprogress .col-label { color: #3b82f6; }
+.done .col-label       { color: #10b981; }
+
+.mini-task {
+  background: #0f1220;
+  border: 1px solid #1e2a45;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #cbd5e1;
+  line-height: 1.4;
+  cursor: default;
+  transition: border-color 0.2s;
+}
+
+.mini-task:hover { border-color: #3b82f6; }
+
+/* ── ACTIVITY FEED ──────────────────────────────────── */
+.activity-section {
+  padding: 90px 40px;
+  background: #0d1117;
+  border-top: 1px solid #1e2a45;
+}
+
+.feed-container {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.feed-window {
+  background: #1a2035;
+  border: 1px solid #1e2a45;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.feed-topbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 20px;
+  background: #151929;
+  border-bottom: 1px solid #1e2a45;
+}
+
+.dot {
+  width: 12px; height: 12px; border-radius: 50%;
+}
+.dot.red    { background: #ff5f57; }
+.dot.yellow { background: #ffbd2e; }
+.dot.green  { background: #28c840; }
+
+.feed-title {
+  font-size: 13px;
+  color: #8892b0;
+  margin-left: 10px;
+  font-weight: 500;
+}
+
+.feed-list {
+  padding: 12px 0;
+}
+
+.feed-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #1e2a4533;
+  animation: fadeInUp 0.4s ease both;
+  transition: background 0.2s;
+}
+
+.feed-item:last-child { border-bottom: none; }
+.feed-item:hover      { background: #151929; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.feed-icon {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700;
+  flex-shrink: 0;
+}
+
+.feed-text { flex: 1; font-size: 14px; line-height: 1.5; }
+.feed-name   { color: #e2e8f0; font-weight: 600; }
+.feed-action { color: #8892b0; }
+.feed-task   { color: #7c6fcd; font-weight: 500; }
+.feed-time   { font-size: 12px; color: #4a5568; white-space: nowrap; }
+
+/* ── BOTTOM CTA ─────────────────────────────────────── */
+.bottom-cta {
+  text-align: center;
+  padding: 100px 40px;
+  background: linear-gradient(160deg, #0f1220 0%, #1a1040 50%, #0f1220 100%);
+  border-top: 1px solid #1e2a45;
+}
+
+.cta-title {
+  font-size: 42px;
+  font-weight: 700;
+  color: #e2e8f0;
+  margin: 0 0 16px;
+}
+
+.cta-sub {
+  font-size: 18px;
+  color: #8892b0;
+  margin: 0 0 36px;
+}
+
+.cta-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #7c6fcd, #3b82f6);
+  color: white;
+  padding: 16px 40px;
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 8px 30px rgba(124, 111, 205, 0.35);
+}
+
+.cta-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px rgba(124, 111, 205, 0.5);
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .stats-grid  { grid-template-columns: repeat(2, 1fr); }
+  .team-grid   { grid-template-columns: 1fr; }
+  .mini-kanban { grid-template-columns: 1fr; }
+  .section-title { font-size: 26px; }
+  .cta-title     { font-size: 28px; }
+}
