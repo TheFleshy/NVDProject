@@ -4,13 +4,25 @@ const path = require('path');
 
 async function connectDB() {
     const db = await open({
-        // Базата ќе се чува во фајл со име database.sqlite внатре во server папката
         filename: path.join(__dirname, 'database.sqlite'),
         driver: sqlite3.Database
     });
 
-    // Автоматски креирај ги табелите при првото пуштање
     await db.exec(`
+        CREATE TABLE IF NOT EXISTS users (
+                                             id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                             name TEXT NOT NULL,
+                                             email TEXT UNIQUE NOT NULL,
+                                             password TEXT NOT NULL,
+                                             role TEXT DEFAULT 'user'
+        );
+
+        -- НОВО: Табела за Тимови
+        CREATE TABLE IF NOT EXISTS teams (
+                                             id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                             name TEXT UNIQUE NOT NULL
+        );
+
         CREATE TABLE IF NOT EXISTS tasks (
                                              id INTEGER PRIMARY KEY AUTOINCREMENT,
                                              title TEXT NOT NULL,
@@ -30,12 +42,18 @@ async function connectDB() {
             );
     `);
 
-    // Вметни една тест задача ако базата е празна
-    const count = await db.get("SELECT COUNT(*) as count FROM tasks");
-    if (count.count === 0) {
+    // ТРИК: Безбедно додавање на нова колона во users ако веќе постои табелата
+    try {
+        await db.exec(`ALTER TABLE users ADD COLUMN team_name TEXT DEFAULT 'Без Тим'`);
+    } catch (err) {
+        // Ако колоната веќе постои, SQLite фрла грешка, ја игнорираме за да не паѓа серверот
+    }
+
+    const userCount = await db.get("SELECT COUNT(*) as count FROM users");
+    if (userCount.count === 0) {
         await db.run(
-            "INSERT INTO tasks (title, description, status, assigned_to) VALUES (?, ?, ?, ?)",
-            ['Поставување на архитектура', 'Креирање на Node.js и React структура во WebStorm', 'in_progress', 'Andrej']
+            "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+            ['Асистент', 'admin@finki.ukim.mk', 'admin123', 'admin']
         );
     }
 

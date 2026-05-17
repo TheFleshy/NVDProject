@@ -1,0 +1,308 @@
+/* РЕУПОТРЕБА НА ГЛАВНИТЕ СТИЛОВИ ОД ADMIN ЗА КОНЗИСТЕНТНОСТ */
+
+.user-kanban-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    align-items: start;
+}
+
+.kanban-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.kanban-column h3 {
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #94a3b8;
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.column-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Помали и пофини картички */
+.task-mini-card {
+    padding: 15px !important;
+    border-radius: 12px !important;
+}
+
+.task-mini-card h4 {
+    margin: 0 0 12px 0;
+    font-size: 15px;
+    color: #f8fafc;
+}
+
+.active-border {
+    border-left: 3px solid #facc15 !important;
+}
+
+.done-opacity {
+    opacity: 0.6;
+    border-left: 3px solid #22c55e !important;
+}
+
+.strike-text {
+    text-decoration: line-through;
+    color: #64748b !important;
+}
+
+/* Мали копчиња за акции */
+.btn-action-small {
+    width: 100%;
+    padding: 8px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: 0.2s;
+}
+
+.btn-action-small:hover {
+    background: rgba(59, 130, 246, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-action-small.finish {
+    color: #4ade80;
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+.btn-action-small.finish:hover {
+    background: rgba(34, 197, 94, 0.2);
+}
+
+.done-tag {
+    font-size: 11px;
+    color: #4ade80;
+    font-weight: bold;
+}
+
+.logout-link {
+    margin-top: 40px;
+    color: #f87171 !important;
+}
+
+.logout-link:hover {
+    background: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Помошни бои за икони */
+.text-glow-yellow {
+    color: #facc15;
+    filter: drop-shadow(0 0 5px rgba(250, 204, 21, 0.4));
+}
+
+.taskname {
+    margin-right: 10px;
+}
+
+/* --- КОНТРОЛА НА ВИСИНА И СКРОЛАЊЕ --- */
+.task-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.real-log-list {
+    max-height: 550px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.column-content {
+    max-height: 65vh; /* Максимална висина од екранот */
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Изглед на копчето за бришење во Админ таблата */
+.btn-delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border: 1px solid transparent;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* --- КУСТОМ SCROLLBAR СО СТАКЛЕН ЕФЕКТ --- */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.5);
+}
+
+/* --- СТИЛОВИ ЗА КОНЗИСТЕНТНИ КОПЧИЊА --- */
+.card-actions-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    width: 100%;
+}
+
+.card-actions-row.done-row {
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Копчето за враќање (Сиво/стаклено) */
+.btn-action-small.return-btn {
+    background: rgba(148, 163, 184, 0.1);
+    border-color: rgba(148, 163, 184, 0.2);
+    color: #cbd5e1;
+    flex: 1; /* Прави копчињата да бидат со иста ширина */
+}
+
+.btn-action-small.return-btn:hover {
+    background: rgba(148, 163, 184, 0.2);
+}
+
+.btn-action-small.flex-auto {
+    flex: 0 1 auto; /* Во Done колоната да не се растегнува премногу */
+    padding: 6px 12px;
+}
+
+/* Стил за твојот текст "Име:" и "Опис:" */
+.taskname {
+    color: #94a3b8;
+    font-weight: normal;
+    font-size: 13px;
+}
+
+/* --- ПЕРФЕКТНА СИМЕТРИЈА ЗА КОПЧИЊАТА --- */
+
+.taskdesc {
+    color: #94a3b8;
+    font-size: 13px;
+    margin: 8px 0 15px 0;
+    line-height: 1.4;
+}
+
+.card-actions-row {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    gap: 10px;
+    width: 100%;
+}
+
+.card-actions-row.split-buttons {
+    justify-content: space-between;
+}
+
+.card-actions-row.space-between {
+    justify-content: space-between;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 12px;
+}
+
+/* Основна форма на сите мали копчиња */
+.btn-action-small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+/* Контрола на ширината */
+.btn-action-small.full-width {
+    width: 100%;
+}
+
+.split-buttons .btn-action-small {
+    flex: 1;
+}
+
+/* 50-50 поделба во In Progress */
+.btn-action-small.auto-width {
+    width: auto;
+    padding: 6px 14px;
+}
+
+/* Мало копче во Done */
+
+/* Бои за копчињата */
+.btn-blue {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.btn-blue:hover {
+    background: rgba(59, 130, 246, 0.25);
+}
+
+.btn-green {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+.btn-green:hover {
+    background: rgba(34, 197, 94, 0.25);
+}
+
+.btn-gray {
+    background: rgba(148, 163, 184, 0.1);
+    color: #cbd5e1;
+    border-color: rgba(148, 163, 184, 0.2);
+}
+
+.btn-gray:hover {
+    background: rgba(148, 163, 184, 0.2);
+    color: #fff;
+}
+
+.done-tag {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #4ade80;
+    font-weight: bold;
+}

@@ -172,3 +172,47 @@
     line-height: 1.5;
 }
 
+/* ── SCROLL TO TOP КОПЧЕ ── */
+.scroll-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 46px;
+    height: 46px;
+    background: rgba(59, 130, 246, 0.15); /* Проѕирно сино */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 999;
+
+    /* Скриено по дифолт со транзиција */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Класа која React ја додава кога ќе скроламе надолу */
+.scroll-to-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Hover ефект */
+.scroll-to-top:hover {
+    background: rgba(59, 130, 246, 0.3);
+    border-color: #60a5fa;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+}
+
+/* Спречување на чудни аутлајни на клик кај некои прелистувачи */
+.scroll-to-top:focus {
+    outline: none;
+}

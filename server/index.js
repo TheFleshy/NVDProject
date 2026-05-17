@@ -15,7 +15,8 @@ connectDB().then(database => {
     console.error("Грешка при поврзување со базата:", err);
 });
 
-// 1. Земи ги сите задачи
+// --- РУТИ ЗА ЗАДАЧИ И ЛОГОВИ ---
+
 app.get('/api/tasks', async (req, res) => {
     try {
         const rows = await db.all('SELECT * FROM tasks ORDER BY id DESC');
@@ -25,59 +26,152 @@ app.get('/api/tasks', async (req, res) => {
     }
 });
 
-// 2. Креирај нова задача
 app.post('/api/tasks', async (req, res) => {
-    const {title, description, assigned_to} = req.body;
+    const {title, description, assigned_to, created_by} = req.body;
     try {
         const result = await db.run(
             'INSERT INTO tasks (title, description, assigned_to) VALUES (?, ?, ?)',
             [title, description, assigned_to]
         );
-
-        // КЛУЧНО ЗА АСИСТЕНТОТ: Запиши во лог дека е креирана задача
         await db.run(
             'INSERT INTO activity_logs (task_id, user_name, action) VALUES (?, ?, ?)',
-            [result.lastID, assigned_to || 'Sistem', `Ја креираше задачата: "${title}"`]
+            [result.lastID, created_by || 'Админ', `Ја додели задачата: "${title}" на ${assigned_to}`]
         );
-
         res.json({message: 'Задачата е успешно креирана!', taskId: result.lastID});
     } catch (err) {
         res.status(500).send('Серверска грешка');
     }
 });
 
-// 3. Ажурирај статус на задача (Кога ја влечат на Kanban таблата)
 app.put('/api/tasks/:id', async (req, res) => {
     const {id} = req.params;
-    const {status, user_name} = req.body; // user_name е кој ја менува во моментот
+    const {status, user_name} = req.body;
     try {
-        // Земи го насловот на задачата за поубав лог
         const task = await db.get('SELECT title FROM tasks WHERE id = ?', [id]);
-
         if (!task) return res.status(404).send('Задачата не е пронајдена');
 
-        // Смени статус во база
         await db.run('UPDATE tasks SET status = ? WHERE id = ?', [status, id]);
-
-        // КЛУЧНО ЗА АСИСТЕНТОТ: Запиши кој што сработил!
         await db.run(
             'INSERT INTO activity_logs (task_id, user_name, action) VALUES (?, ?, ?)',
             [id, user_name, `Го смени статусот на "${task.title}" во [${status.toUpperCase()}]`]
         );
-
         res.json({message: 'Статусот е ажуриран и промената е запишана!'});
     } catch (err) {
         res.status(500).send('Серверска грешка');
     }
 });
 
-// 4. Земи ги сите активности (Ова е делот каде асистентот ќе гледа прогрес)
+app.delete('/api/tasks/:id', async (req, res) => {
+    const {id} = req.params;
+    try {
+        const task = await db.get('SELECT title FROM tasks WHERE id = ?', [id]);
+        if (!task) return res.status(404).send('Задачата не е пронајдена');
+
+        await db.run('DELETE FROM activity_logs WHERE task_id = ?', [id]);
+        await db.run('DELETE FROM tasks WHERE id = ?', [id]);
+        await db.run(
+            'INSERT INTO activity_logs (task_id, user_name, action) VALUES (?, ?, ?)',
+            [null, 'Админ', `Ја избриша задачата: "${task.title}"`]
+        );
+        res.json({message: 'Задачата е избришана!'});
+    } catch (err) {
+        res.status(500).send('Серверска грешка');
+    }
+});
+
 app.get('/api/activity-logs', async (req, res) => {
     try {
         const logs = await db.all('SELECT * FROM activity_logs ORDER BY created_at DESC');
         res.json(logs);
     } catch (err) {
         res.status(500).send('Серверска грешка');
+    }
+});
+
+// --- РУТИ ЗА КОРИСНИЦИ (АВТЕНТИКАЦИЈА И УЛОГИ) ---
+
+app.post('/api/register', async (req, res) => {
+    const {name, email, password} = req.body;
+    try {
+        const result = await db.run(
+            'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+            [name, email, password, 'user']
+        );
+        res.status(201).json({message: 'Корисникот е успешно креиран!', id: result.lastID});
+    } catch (err) {
+        if (err.message && err.message.includes('UNIQUE constraint failed')) {
+            return res.status(400).send('Овој е-маил веќе постои во системот.');
+        }
+        res.status(500).send('Серверска грешка при регистрација');
+    }
+});
+
+app.post('/api/login', async (req, res) => {
+    const {email, password} = req.body;
+    try {
+        const user = await db.get('SELECT * FROM users WHERE email = ? AND password = ?', [email, password]);
+        if (!user) {
+            return res.status(401).send('Погрешен е-маил или лозинка');
+        }
+        res.json({id: user.id, name: user.name, email: user.email, role: user.role});
+    } catch (err) {
+        res.status(500).send('Серверска грешка при најава');
+    }
+});
+
+app.put('/api/users/:id/role', async (req, res) => {
+    const {id} = req.params;
+    const {role} = req.body;
+    try {
+        await db.run('UPDATE users SET role = ? WHERE id = ?', [role, id]);
+        res.json({message: 'Улогата е успешно ажурирана!'});
+    } catch (err) {
+        res.status(500).send('Грешка при ажурирање на улога');
+    }
+});
+
+// --- РУТИ ЗА ТИМОВИ ---
+
+app.post('/api/teams', async (req, res) => {
+    const {name} = req.body;
+    try {
+        const result = await db.run('INSERT INTO teams (name) VALUES (?)', [name]);
+        res.json({message: 'Тимот е успешно креиран!', id: result.lastID});
+    } catch (err) {
+        if (err.message.includes('UNIQUE')) {
+            return res.status(400).send('Ова име на тим веќе постои.');
+        }
+        res.status(500).send('Грешка при креирање тим');
+    }
+});
+
+app.get('/api/teams', async (req, res) => {
+    try {
+        const teams = await db.all('SELECT * FROM teams');
+        res.json(teams);
+    } catch (err) {
+        res.status(500).send('Грешка при влечење тимови');
+    }
+});
+
+app.put('/api/users/:id/team', async (req, res) => {
+    const {id} = req.params;
+    const {team_name} = req.body;
+    try {
+        await db.run('UPDATE users SET team_name = ? WHERE id = ?', [team_name, id]);
+        res.json({message: 'Корисникот е додаден во тимот!'});
+    } catch (err) {
+        res.status(500).send('Грешка при ажурирање тим на корисник');
+    }
+});
+
+// ОВА Е ЕДИНСТВЕНАТА РУТА ЗА КОРИСНИЦИ СЕГА (Го влече и team_name)
+app.get('/api/users', async (req, res) => {
+    try {
+        const users = await db.all('SELECT id, name, email, role, team_name FROM users');
+        res.json(users);
+    } catch (err) {
+        res.status(500).send('Грешка при влечење корисници');
     }
 });
 

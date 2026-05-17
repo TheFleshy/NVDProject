@@ -1,16 +1,16 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { LayoutDashboard, Users, Activity } from 'lucide-react';
+import React, {useState, useEffect} from 'react';
+import {Link} from 'react-router-dom';
+import {LayoutDashboard, Users, Activity, ArrowUp} from 'lucide-react';
 import './Landing.css';
 import './LandingSections.css';
 
-// ── TEAM PROGRESS ────────────────────────────────────
+// ── TEAM PROGRESS SECTION ─────────────────────────────
 const TeamProgressSection = () => {
     const members = [
-        { initials: "АП", name: "Ана Петрова",        done: 12, total: 14, color: "#7c6fcd" },
-        { initials: "СИ", name: "Стефан Илиев",       done: 8,  total: 13, color: "#3b82f6" },
-        { initials: "ЕС", name: "Елена Стојановска",  done: 6,  total: 10, color: "#10b981" },
-        { initials: "МН", name: "Марко Николов",      done: 10, total: 11, color: "#f59e0b" },
+        {initials: "АП", name: "Ана Петрова", done: 12, total: 14, color: "#7c6fcd"},
+        {initials: "СИ", name: "Стефан Илиев", done: 8, total: 13, color: "#3b82f6"},
+        {initials: "ЕС", name: "Елена Стојановска", done: 6, total: 10, color: "#10b981"},
+        {initials: "МН", name: "Марко Николов", done: 10, total: 11, color: "#f59e0b"},
     ];
 
     return (
@@ -19,7 +19,7 @@ const TeamProgressSection = () => {
                 <span className="section-badge">Team Tracking</span>
                 <h2 className="section-title">Гледај го напредокот на секој член</h2>
                 <p className="section-subtitle">
-                    Во реално време — кој работи на шо, колку е завршено и кој е следниот чекор.
+                    Во реално време — кој работи на што, колку е завршено и кој е следниот чекор.
                 </p>
             </div>
 
@@ -29,7 +29,7 @@ const TeamProgressSection = () => {
                         const pct = Math.round((m.done / m.total) * 100);
                         return (
                             <div className="member-row" key={m.initials}>
-                                <div className="member-avatar" style={{ background: m.color + "22", color: m.color }}>
+                                <div className="member-avatar" style={{background: m.color + "22", color: m.color}}>
                                     {m.initials}
                                 </div>
                                 <div className="member-info">
@@ -38,10 +38,11 @@ const TeamProgressSection = () => {
                                         <span className="member-count">{m.done}/{m.total} задачи</span>
                                     </div>
                                     <div className="progress-track">
-                                        <div className="progress-fill" style={{ width: pct + "%", background: m.color }} />
+                                        <div className="progress-fill" style={{width: pct + "%", background: m.color}}/>
                                     </div>
                                 </div>
-                                <span className="member-pct" style={{ color: m.color }}>{pct}%</span>
+                                {/* ПОПРАВЕНО: Тука беше згрешена заградата */}
+                                <span className="member-pct" style={{color: m.color}}>{pct}%</span>
                             </div>
                         );
                     })}
@@ -69,14 +70,49 @@ const TeamProgressSection = () => {
     );
 };
 
-// ── ACTIVITY FEED ────────────────────────────────────
+// ── ACTIVITY FEED SECTION ─────────────────────────────
 const ActivityFeedSection = () => {
     const logs = [
-        { icon: "✓", name: "Ана Петрова",        action: "ја заврши задачата",  task: "Landing дизајн",    time: "пред 2 мин",  color: "#10b981" },
-        { icon: "→", name: "Стефан Илиев",       action: "ја помести во Review", task: "API за плаќање",   time: "пред 15 мин", color: "#7c6fcd" },
-        { icon: "✎", name: "Елена Стојановска",  action: "коментираше на",       task: "Unit тестови",      time: "пред 1 час",  color: "#f59e0b" },
-        { icon: "+", name: "Марко Николов",       action: "создаде задача",       task: "SEO оптимизација",  time: "пред 2 часа", color: "#3b82f6" },
-        { icon: "✓", name: "Ана Петрова",        action: "ја заврши задачата",   task: "Auth систем",       time: "пред 3 часа", color: "#10b981" },
+        {
+            icon: "✓",
+            name: "Ана Петрова",
+            action: "ја заврши задачата",
+            task: "Landing дизајн",
+            time: "пред 2 мин",
+            color: "#10b981"
+        },
+        {
+            icon: "→",
+            name: "Стефан Илиев",
+            action: "ја помести во Review",
+            task: "API за плаќање",
+            time: "пред 15 мин",
+            color: "#7c6fcd"
+        },
+        {
+            icon: "✎",
+            name: "Елена Стојановска",
+            action: "коментираше на",
+            task: "Unit тестови",
+            time: "пред 1 час",
+            color: "#f59e0b"
+        },
+        {
+            icon: "+",
+            name: "Марко Николов",
+            action: "создаде задача",
+            task: "SEO оптимизација",
+            time: "пред 2 часа",
+            color: "#3b82f6"
+        },
+        {
+            icon: "✓",
+            name: "Ана Петрова",
+            action: "ја заврши задачата",
+            task: "Auth систем",
+            time: "пред 3 часа",
+            color: "#10b981"
+        },
     ];
 
     return (
@@ -85,22 +121,22 @@ const ActivityFeedSection = () => {
                 <span className="section-badge">Activity Log</span>
                 <h2 className="section-title">Секоја акција е забележана</h2>
                 <p className="section-subtitle">
-                    Целосна историја — кој, шо и кога. Никогаш нема да прашаш „кој го направи ова?".
+                    Целосна историја — кој, што и кога. Никогаш нема да прашаш „кој го направи ова?".
                 </p>
             </div>
 
             <div className="feed-container">
                 <div className="feed-window">
                     <div className="feed-topbar">
-                        <div className="dot red" />
-                        <div className="dot yellow" />
-                        <div className="dot green" />
+                        <div className="dot red"/>
+                        <div className="dot yellow"/>
+                        <div className="dot green"/>
                         <span className="feed-title">Activity Feed — во живо</span>
                     </div>
                     <div className="feed-list">
                         {logs.map((log, i) => (
-                            <div className="feed-item" key={i} style={{ animationDelay: i * 0.1 + "s" }}>
-                                <div className="feed-icon" style={{ background: log.color + "22", color: log.color }}>
+                            <div className="feed-item" key={i} style={{animationDelay: i * 0.1 + "s"}}>
+                                <div className="feed-icon" style={{background: log.color + "22", color: log.color}}>
                                     {log.icon}
                                 </div>
                                 <div className="feed-text">
@@ -118,7 +154,7 @@ const ActivityFeedSection = () => {
     );
 };
 
-// ── STATS ────────────────────────────────────────────
+// ── STATS SECTION ─────────────────────────────────────
 const StatsSection = () => (
     <section className="stats-section">
         <div className="stats-grid">
@@ -142,7 +178,7 @@ const StatsSection = () => (
     </section>
 );
 
-// ── BOTTOM CTA ───────────────────────────────────────
+// ── BOTTOM CTA SECTION ────────────────────────────────
 const BottomCTA = () => (
     <section className="bottom-cta">
         <h2 className="cta-title">Подготвен да го организираш тимот?</h2>
@@ -151,22 +187,42 @@ const BottomCTA = () => (
     </section>
 );
 
-// ── MAIN LANDING ─────────────────────────────────────
+// ── MAIN LANDING COMPONENT ────────────────────────────
 const Landing = () => {
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        const toggleVisibility = () => {
+            if (window.scrollY > 300) {
+                setIsVisible(true);
+            } else {
+                setIsVisible(false);
+            }
+        };
+
+        window.addEventListener('scroll', toggleVisibility);
+        return () => window.removeEventListener('scroll', toggleVisibility);
+    }, []);
+
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
     return (
         <div className="landing-container">
-
             {/* Навигација */}
             <nav className="navbar">
                 <div className="logo">
-                    <LayoutDashboard className="logo-icon" />
+                    <LayoutDashboard className="logo-icon"/>
                     <span>NVD<span className="text-blue">Tracker</span></span>
                 </div>
                 <div className="nav-links">
                     <a href="#features" className="nav-link">Карактеристики</a>
                     <a href="#team" className="nav-link">За тимови</a>
                     <a href="#activity" className="nav-link">Activity Log</a>
-                    <Link to="/login" className="btn-ghost">Најава</Link>
                     <Link to="/login" className="btn-primary">Започни</Link>
                 </div>
             </nav>
@@ -175,8 +231,8 @@ const Landing = () => {
             <header className="hero-section">
                 <div className="hero-content">
                     <h1>
-                        Управувајте со проектите <br />
-                        <span className="gradient-text">без хаос.</span>
+                        Менаџирајте со проектите <br/>
+                        <span className="gradient-text">брзо и едноставно.</span>
                     </h1>
                     <p>
                         Напреден систем за следење на задачи, менаџирање тимови и анализа на прогресот.
@@ -193,21 +249,21 @@ const Landing = () => {
             <section id="features" className="features-section">
                 <div className="feature-card">
                     <div className="icon-wrapper blue">
-                        <Activity size={32} />
+                        <Activity size={32}/>
                     </div>
                     <h3>Activity Tracking</h3>
                     <p>Следете го секој чекор. Знајте точно кој, што и кога сработил преку детални логови.</p>
                 </div>
                 <div className="feature-card">
                     <div className="icon-wrapper purple">
-                        <LayoutDashboard size={32} />
+                        <LayoutDashboard size={32}/>
                     </div>
                     <h3>Kanban Табли</h3>
                     <p>Визуелизирајте го прогресот. Преместувајте задачи од To-Do до Done со леснотија.</p>
                 </div>
                 <div className="feature-card">
                     <div className="icon-wrapper green">
-                        <Users size={32} />
+                        <Users size={32}/>
                     </div>
                     <h3>Тимска Работа</h3>
                     <p>Креирајте тимови, доделувајте задачи и зголемете ја продуктивноста на секој член.</p>
@@ -216,20 +272,28 @@ const Landing = () => {
 
             {/* Team Progress */}
             <section id="team">
-                <TeamProgressSection />
+                <TeamProgressSection/>
             </section>
 
             {/* Activity Feed */}
             <section id="activity">
-                <ActivityFeedSection />
+                <ActivityFeedSection/>
             </section>
 
             {/* Stats  */}
-            <StatsSection />
+            <StatsSection/>
 
             {/* Bottom CTA */}
-            <BottomCTA />
+            <BottomCTA/>
 
+            {/* Scroll To Top Копче */}
+            <button
+                className={`scroll-to-top ${isVisible ? 'visible' : ''}`}
+                onClick={scrollToTop}
+                title="Врати се најгоре"
+            >
+                <ArrowUp size={20}/>
+            </button>
         </div>
     );
 };
