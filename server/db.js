@@ -53,7 +53,7 @@ async function connectDB() {
     if (userCount.count === 0) {
         await db.run(
             "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
-            ['Асистент', 'admin@finki.ukim.mk', 'admin123', 'admin']
+            ['Админ', 'admin@finki.ukim.mk', 'admin123', 'admin']
         );
     }
 

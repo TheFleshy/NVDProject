@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import {LayoutDashboard, Users, Shield, LogOut, Plus, UsersRound} from 'lucide-react';
+import {LayoutDashboard, Users, Shield, LogOut, Plus, UsersRound, Trash2} from 'lucide-react';
 import {Link, useNavigate} from 'react-router-dom';
 import './AdminDashboard.css';
 
@@ -18,9 +18,9 @@ const RoleManagement = () => {
             navigate('/');
         } else {
             fetchUsers();
-            fetchTeams(); // Ги влечеме и тимовите при пуштање
+            fetchTeams();
         }
-    }, [navigate]);
+    }, [navigate, loggedInUser.role]); // <--- ПОПРАВЕНО
 
     const fetchUsers = async () => {
         try {
@@ -73,6 +73,30 @@ const RoleManagement = () => {
         }
     };
 
+    // НОВО: Бришење на корисник
+    const handleDeleteUser = async (userId, userName) => {
+        if (window.confirm(`ВНИМАНИЕ: Дали сте сигурни дека сакате трајно да го избришете корисникот "${userName}"?`)) {
+            try {
+                await axios.delete(`http://localhost:5000/api/users/${userId}`);
+                fetchUsers(); // Освежи ја листата веднаш
+            } catch (error) {
+                alert(error.response?.data || "Грешка при бришење");
+            }
+        }
+    };
+
+    const handleDeleteTeam = async (teamId, teamName) => {
+        if (window.confirm(`Дали си сигурен дека сакаш да го избришеш тимот "${teamName}"? Сите негови членови ќе бидат вратени на "Без Тим".`)) {
+            try {
+                await axios.delete(`http://localhost:5000/api/teams/${teamId}`);
+                fetchTeams(); // Освежи ја листата на тимови
+                fetchUsers(); // Освежи ги корисниците (затоа што некои изгубија тим)
+            } catch (error) {
+                console.error("Грешка при бришење тим", error);
+            }
+        }
+    };
+
     const handleLogout = () => {
         localStorage.removeItem('user');
         navigate('/login');
@@ -114,10 +138,12 @@ const RoleManagement = () => {
                 <div className="admin-grid" style={{gridTemplateColumns: '1fr', gap: '20px'}}>
 
                     {/* НОВО: Секција за креирање тимови */}
+                    {/* Секција за креирање и бришење тимови */}
                     <section className="glass-card mt-4">
-                        <h3><Plus className="text-glow-purple" size={18}/> Креирај Нов Тим</h3>
+                        <h3><Plus className="text-glow-purple" size={18}/> Менаџирање со Тимови</h3>
+
                         <form onSubmit={handleCreateTeam} className="glass-form"
-                              style={{flexDirection: 'row', alignItems: 'center'}}>
+                              style={{flexDirection: 'row', alignItems: 'center', marginBottom: '20px'}}>
                             <input
                                 type="text"
                                 placeholder="Внеси име на тим (пр. Frontend, Маркетинг)..."
@@ -130,6 +156,40 @@ const RoleManagement = () => {
                                 Додај Тим <UsersRound size={16}/>
                             </button>
                         </form>
+
+                        {/* НОВО: Листа на постоечки тимови */}
+                        <div style={{display: 'flex', flexWrap: 'wrap', gap: '10px'}}>
+                            {teams.length === 0 ? (
+                                <span
+                                    style={{fontSize: '13px', color: '#64748b'}}>Нема креирани тимови во базата.</span>
+                            ) : (
+                                teams.map(team => (
+                                    <div key={team.id} style={{
+                                        display: 'flex', alignItems: 'center', gap: '8px',
+                                        background: 'rgba(255, 255, 255, 0.03)',
+                                        padding: '8px 15px',
+                                        borderRadius: '20px',
+                                        border: '1px solid rgba(255, 255, 255, 0.1)'
+                                    }}>
+                                        <span style={{
+                                            fontSize: '13px',
+                                            color: '#e2e8f0',
+                                            fontWeight: '500'
+                                        }}>📂 {team.name}</span>
+                                        <button
+                                            onClick={() => handleDeleteTeam(team.id, team.name)}
+                                            style={{
+                                                background: 'none', border: 'none', cursor: 'pointer',
+                                                color: '#ef4444', display: 'flex', alignItems: 'center', padding: '2px'
+                                            }}
+                                            title="Избриши тим"
+                                        >
+                                            <Trash2 size={14}/>
+                                        </button>
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </section>
 
                     {/* Секција за корисници */}
@@ -165,6 +225,7 @@ const RoleManagement = () => {
                                         </div>
 
                                         {/* Мени за УЛОГА */}
+                                        {/* Мени за УЛОГА */}
                                         <div style={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
                                             <span style={{
                                                 fontSize: '11px',
@@ -186,11 +247,23 @@ const RoleManagement = () => {
                                                     value={user.role}
                                                     onChange={(e) => handleRoleChange(user.id, e.target.value)}
                                                 >
-                                                    <option value="user">User </option>
-                                                    <option value="admin">Admin </option>
+                                                    <option value="user">User</option>
+                                                    <option value="admin">Admin</option>
                                                 </select>
                                             )}
                                         </div>
+
+                                        {/* НОВО: Копче за бришење (Само за главниот админ, и не за самиот себе) */}
+                                        {loggedInUser.email === 'admin@finki.ukim.mk' && user.email !== 'admin@finki.ukim.mk' && (
+                                            <button
+                                                onClick={() => handleDeleteUser(user.id, user.name)}
+                                                className="btn-delete"
+                                                style={{height: '40px', marginTop: '18px', padding: '0 12px'}}
+                                                title="Избриши корисник"
+                                            >
+                                                <Trash2 size={16}/>
+                                            </button>
+                                        )}
 
                                     </div>
                                 </div>

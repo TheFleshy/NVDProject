@@ -165,6 +165,25 @@ app.put('/api/users/:id/team', async (req, res) => {
     }
 });
 
+app.delete('/api/teams/:id', async (req, res) => {
+    const {id} = req.params;
+    try {
+        // Прво го наоѓаме тимот за да му го знаеме името
+        const team = await db.get('SELECT name FROM teams WHERE id = ?', [id]);
+        if (!team) return res.status(404).send('Тимот не е пронајден');
+
+        // ГЕНИЈАЛНИОТ ДЕЛ: Ги враќаме сите корисници од тој тим на 'Без Тим'
+        await db.run('UPDATE users SET team_name = ? WHERE team_name = ?', ['Без Тим', team.name]);
+
+        // На крај, го бришеме самиот тим
+        await db.run('DELETE FROM teams WHERE id = ?', [id]);
+
+        res.json({message: 'Тимот е избришан и корисниците се ажурирани!'});
+    } catch (err) {
+        res.status(500).send('Грешка при бришење на тим');
+    }
+});
+
 // ОВА Е ЕДИНСТВЕНАТА РУТА ЗА КОРИСНИЦИ СЕГА (Го влече и team_name)
 app.get('/api/users', async (req, res) => {
     try {
@@ -172,6 +191,23 @@ app.get('/api/users', async (req, res) => {
         res.json(users);
     } catch (err) {
         res.status(500).send('Грешка при влечење корисници');
+    }
+});
+
+// 14. Избриши корисник (Само Главен Админ)
+app.delete('/api/users/:id', async (req, res) => {
+    const {id} = req.params;
+    try {
+        // ЗАШТИТА: Не дозволувај бришење на главниот админ дури и преку API
+        const user = await db.get('SELECT email FROM users WHERE id = ?', [id]);
+        if (user && user.email === 'admin@finki.ukim.mk') {
+            return res.status(403).send('Забрането: Главниот администратор не може да се избрише!');
+        }
+
+        await db.run('DELETE FROM users WHERE id = ?', [id]);
+        res.json({message: 'Корисникот е успешно избришан!'});
+    } catch (err) {
+        res.status(500).send('Грешка при бришење на корисник');
     }
 });
 

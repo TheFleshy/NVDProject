@@ -4,7 +4,6 @@ import {
     Activity,
     Plus,
     CheckCircle,
-    Clock,
     LayoutDashboard,
     Target,
     Zap,
@@ -122,10 +121,14 @@ const AdminDashboard = () => {
 
     // --- ФУНКЦИЈА ЗА ПРЕСМЕТУВАЊЕ ВРЕМЕ ---
     const timeAgo = (dateString) => {
-        const date = new Date(dateString);
+
+        const safeDateString = dateString.includes('T') ? dateString : dateString.replace(' ', 'T') + 'Z';
+
+        const date = new Date(safeDateString);
         const now = new Date();
         const diffInSeconds = Math.floor((now - date) / 1000);
 
+        if (diffInSeconds < 0) return 'пред малку'; // Заштита од негативни секунди
         if (diffInSeconds < 60) return 'пред малку';
         const diffInMinutes = Math.floor(diffInSeconds / 60);
         if (diffInMinutes < 60) return `пред ${diffInMinutes} мин`;
@@ -177,7 +180,7 @@ const AdminDashboard = () => {
 
             <main className="admin-main">
                 <header className="admin-header">
-                    <h1>Преглед на Проектот</h1>
+                    <h1>Администраторски преглед</h1>
                     <p>Најавени сте како: <strong>{loggedInUser.name}</strong> <Shield size={14} style={{
                         display: 'inline',
                         color: '#c084fc',
@@ -238,7 +241,7 @@ const AdminDashboard = () => {
                         </section>
 
                         <section className="glass-card mt-4">
-                            <h3><CheckCircle className="text-glow-green" size={18}/> Активни Задачи во Базата</h3>
+                            <h3><CheckCircle className="text-glow-green" size={18}/> Активни Задачи</h3>
                             <div className="task-list">
                                 {tasks.length === 0 ?
                                     <p className="text-muted">Нема active задачи.</p> : tasks.map(task => (

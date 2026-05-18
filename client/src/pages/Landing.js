@@ -154,29 +154,29 @@ const ActivityFeedSection = () => {
     );
 };
 
-// ── STATS SECTION ─────────────────────────────────────
-const StatsSection = () => (
-    <section className="stats-section">
-        <div className="stats-grid">
-            <div className="stat-card">
-                <span className="stat-number">500+</span>
-                <span className="stat-label">Задачи следени</span>
-            </div>
-            <div className="stat-card">
-                <span className="stat-number">5</span>
-                <span className="stat-label">Члена во тим</span>
-            </div>
-            <div className="stat-card">
-                <span className="stat-number">98%</span>
-                <span className="stat-label">Точност на следење</span>
-            </div>
-            <div className="stat-card">
-                <span className="stat-number">24/7</span>
-                <span className="stat-label">Real-time ажурирање</span>
-            </div>
-        </div>
-    </section>
-);
+// // ── STATS SECTION ─────────────────────────────────────
+// const StatsSection = () => (
+//     <section className="stats-section">
+//         <div className="stats-grid">
+//             <div className="stat-card">
+//                 <span className="stat-number">500+</span>
+//                 <span className="stat-label">Задачи следени</span>
+//             </div>
+//             <div className="stat-card">
+//                 <span className="stat-number">5</span>
+//                 <span className="stat-label">Члена во тим</span>
+//             </div>
+//             <div className="stat-card">
+//                 <span className="stat-number">98%</span>
+//                 <span className="stat-label">Точност на следење</span>
+//             </div>
+//             <div className="stat-card">
+//                 <span className="stat-number">24/7</span>
+//                 <span className="stat-label">Real-time ажурирање</span>
+//             </div>
+//         </div>
+//     </section>
+// );
 
 // ── BOTTOM CTA SECTION ────────────────────────────────
 const BottomCTA = () => (
@@ -280,8 +280,8 @@ const Landing = () => {
                 <ActivityFeedSection/>
             </section>
 
-            {/* Stats  */}
-            <StatsSection/>
+            {/*/!* Stats  *!/*/}
+            {/*<StatsSection/>*/}
 
             {/* Bottom CTA */}
             <BottomCTA/>
