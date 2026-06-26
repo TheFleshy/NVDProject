@@ -8,12 +8,90 @@ app.use(express.json());
 
 let db;
 
-connectDB().then(database => {
+connectDB().then(async (database) => {
     db = database;
     console.log("Успешно поврзано со SQLite базата!");
+
+    // --- НОВО: Креирање табела за динамични Kanban колони ---
+    try {
+        await db.run(`
+            CREATE TABLE IF NOT EXISTS kanban_columns
+            (
+                id
+                INTEGER
+                PRIMARY
+                KEY
+                AUTOINCREMENT,
+                name
+                TEXT
+                UNIQUE,
+                status_value
+                TEXT
+                UNIQUE
+            )
+        `);
+
+        // Проверка дали има колони, ако нема стави ги основните 3
+        const colCount = await db.get('SELECT count(*) as count FROM kanban_columns');
+        if (colCount.count === 0) {
+            await db.run("INSERT INTO kanban_columns (name, status_value) VALUES ('TODO', 'todo'), ('IN PROGRESS', 'in_progress'), ('DONE', 'done')");
+            console.log("Креирани се основните 3 Kanban колони.");
+        }
+    } catch (err) {
+        console.error("Грешка при сетирање на колоните:", err);
+    }
+
 }).catch(err => {
     console.error("Грешка при поврзување со базата:", err);
 });
+
+// --- НОВИ РУТИ ЗА KANBAN КОЛОНИ ---
+
+app.get('/api/columns', async (req, res) => {
+    try {
+        const columns = await db.all('SELECT * FROM kanban_columns ORDER BY id ASC');
+        res.json(columns);
+    } catch (err) {
+        res.status(500).send('Грешка при влечење колони');
+    }
+});
+
+app.post('/api/columns', async (req, res) => {
+    const {name} = req.body;
+    // Генерираме ID вредност од името (пр. "QA Review" станува "qa_review")
+    const status_value = name.trim().toLowerCase().replace(/\s+/g, '_');
+
+    try {
+        await db.run('INSERT INTO kanban_columns (name, status_value) VALUES (?, ?)', [name, status_value]);
+        res.status(201).json({message: 'Колоната е успешно додадена!'});
+    } catch (err) {
+        res.status(500).send('Грешка при креирање колона (можеби името веќе постои).');
+    }
+});
+
+// Избриши колона (Само за Админ)
+app.delete('/api/columns/:id', async (req, res) => {
+    const {id} = req.params;
+    try {
+        const column = await db.get('SELECT * FROM kanban_columns WHERE id = ?', [id]);
+        if (!column) return res.status(404).send('Колоната не е пронајдена');
+
+        // ЗАШТИТА: Не дозволувај бришење на основните 3 колони!
+        if (['todo', 'in_progress', 'done'].includes(column.status_value)) {
+            return res.status(403).send('Забрането: Основните колони не можат да се избришат!');
+        }
+
+        // ПАМЕТЕН ПОТЕГ: Пред да ја избришеме колоната, ги враќаме сите нејзини задачи во 'TODO'
+        await db.run('UPDATE tasks SET status = ? WHERE status = ?', ['todo', column.status_value]);
+
+        // На крај, ја бришеме самата колона
+        await db.run('DELETE FROM kanban_columns WHERE id = ?', [id]);
+        res.json({message: 'Колоната е избришана, задачите се преместени во TODO!'});
+    } catch (err) {
+        res.status(500).send('Грешка при бришење на колоната');
+    }
+});
+
 
 // --- РУТИ ЗА ЗАДАЧИ И ЛОГОВИ ---
 
@@ -168,14 +246,10 @@ app.put('/api/users/:id/team', async (req, res) => {
 app.delete('/api/teams/:id', async (req, res) => {
     const {id} = req.params;
     try {
-        // Прво го наоѓаме тимот за да му го знаеме името
         const team = await db.get('SELECT name FROM teams WHERE id = ?', [id]);
         if (!team) return res.status(404).send('Тимот не е пронајден');
 
-        // ГЕНИЈАЛНИОТ ДЕЛ: Ги враќаме сите корисници од тој тим на 'Без Тим'
         await db.run('UPDATE users SET team_name = ? WHERE team_name = ?', ['Без Тим', team.name]);
-
-        // На крај, го бришеме самиот тим
         await db.run('DELETE FROM teams WHERE id = ?', [id]);
 
         res.json({message: 'Тимот е избришан и корисниците се ажурирани!'});
@@ -184,7 +258,6 @@ app.delete('/api/teams/:id', async (req, res) => {
     }
 });
 
-// ОВА Е ЕДИНСТВЕНАТА РУТА ЗА КОРИСНИЦИ СЕГА (Го влече и team_name)
 app.get('/api/users', async (req, res) => {
     try {
         const users = await db.all('SELECT id, name, email, role, team_name FROM users');
@@ -198,7 +271,6 @@ app.get('/api/users', async (req, res) => {
 app.delete('/api/users/:id', async (req, res) => {
     const {id} = req.params;
     try {
-        // ЗАШТИТА: Не дозволувај бришење на главниот админ дури и преку API
         const user = await db.get('SELECT email FROM users WHERE id = ?', [id]);
         if (user && user.email === 'admin@finki.ukim.mk') {
             return res.status(403).send('Забрането: Главниот администратор не може да се избрише!');
