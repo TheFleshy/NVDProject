@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nvd-database-svc
+  namespace: nvd-system
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: nvd-database
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nvd-database
+  namespace: nvd-system
+spec:
+  serviceName: "nvd-database-svc"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nvd-database
+  template:
+    metadata:
+      labels:
+        app: nvd-database
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: nvd-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nvd-secrets
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: nvd-config
+                  key: POSTGRES_DB
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: db-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: db-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi

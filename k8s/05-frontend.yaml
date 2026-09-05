@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nvd-frontend-svc
+  namespace: nvd-system
+spec:
+  selector:
+    app: nvd-frontend
+  ports:
+    - port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nvd-frontend
+  namespace: nvd-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nvd-frontend
+  template:
+    metadata:
+      labels:
+        app: nvd-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: stojkovskiandrej/nvd-frontend:latest
+          ports:
+            - containerPort: 3000
