@@ -1,63 +1,140 @@
-const sqlite3 = require('sqlite3');
-const { open } = require('sqlite');
-const path = require('path');
+const {Pool} = require('pg');
+
+const pool = new Pool({
+    user: process.env.DB_USER || 'postgres',
+    host: process.env.DB_HOST || 'localhost',
+    database: process.env.DB_NAME || 'nvd_db',
+    password: process.env.DB_PASS || 'supersecret',
+    port: process.env.DB_PORT || 5432,
+});
+
+const adaptSql = (sql) => {
+    let i = 1;
+    return sql.replace(/\?/g, () => `$${i++}`);
+};
 
 async function connectDB() {
-    const db = await open({
-        filename: path.join(__dirname, 'database.sqlite'),
-        driver: sqlite3.Database
-    });
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS users
+        (
+            id
+            SERIAL
+            PRIMARY
+            KEY,
+            name
+            VARCHAR
+        (
+            255
+        ) NOT NULL,
+            email VARCHAR
+        (
+            255
+        ) UNIQUE NOT NULL,
+            password VARCHAR
+        (
+            255
+        ) NOT NULL,
+            role VARCHAR
+        (
+            50
+        ) DEFAULT 'user',
+            team_name VARCHAR
+        (
+            255
+        ) DEFAULT 'Без Тим'
+            );
 
-    await db.exec(`
-        CREATE TABLE IF NOT EXISTS users (
-                                             id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                             name TEXT NOT NULL,
-                                             email TEXT UNIQUE NOT NULL,
-                                             password TEXT NOT NULL,
-                                             role TEXT DEFAULT 'user'
-        );
+        CREATE TABLE IF NOT EXISTS teams
+        (
+            id
+            SERIAL
+            PRIMARY
+            KEY,
+            name
+            VARCHAR
+        (
+            255
+        ) UNIQUE NOT NULL
+            );
 
-        -- НОВО: Табела за Тимови
-        CREATE TABLE IF NOT EXISTS teams (
-                                             id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                             name TEXT UNIQUE NOT NULL
-        );
+        CREATE TABLE IF NOT EXISTS tasks
+        (
+            id
+            SERIAL
+            PRIMARY
+            KEY,
+            title
+            VARCHAR
+        (
+            255
+        ) NOT NULL,
+            description TEXT,
+            status VARCHAR
+        (
+            50
+        ) DEFAULT 'todo',
+            assigned_to VARCHAR
+        (
+            255
+        ),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
 
-        CREATE TABLE IF NOT EXISTS tasks (
-                                             id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                             title TEXT NOT NULL,
-                                             description TEXT,
-                                             status TEXT DEFAULT 'todo',
-                                             assigned_to TEXT,
-                                             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
-
-        CREATE TABLE IF NOT EXISTS activity_logs (
-                                                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                                     task_id INTEGER,
-                                                     user_name TEXT,
-                                                     action TEXT,
-                                                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                                                     FOREIGN KEY (task_id) REFERENCES tasks(id)
+        CREATE TABLE IF NOT EXISTS activity_logs
+        (
+            id
+            SERIAL
+            PRIMARY
+            KEY,
+            task_id
+            INTEGER,
+            user_name
+            VARCHAR
+        (
+            255
+        ),
+            action VARCHAR
+        (
+            255
+        ),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY
+        (
+            task_id
+        ) REFERENCES tasks
+        (
+            id
+        )
             );
     `);
 
-    // ТРИК: Безбедно додавање на нова колона во users ако веќе постои табелата
-    try {
-        await db.exec(`ALTER TABLE users ADD COLUMN team_name TEXT DEFAULT 'Без Тим'`);
-    } catch (err) {
-        // Ако колоната веќе постои, SQLite фрла грешка, ја игнорираме за да не паѓа серверот
-    }
+    const dbWrapper = {
+        all: async (sql, params = []) => {
+            const res = await pool.query(adaptSql(sql), params);
+            return res.rows;
+        },
+        get: async (sql, params = []) => {
+            const res = await pool.query(adaptSql(sql), params);
+            return res.rows[0];
+        },
+        run: async (sql, params = []) => {
+            await pool.query(adaptSql(sql), params);
+        },
+        exec: async (sql) => {
+            await pool.query(sql);
+        }
+    };
 
-    const userCount = await db.get("SELECT COUNT(*) as count FROM users");
-    if (userCount.count === 0) {
-        await db.run(
+    const res = await dbWrapper.get("SELECT COUNT(*) as count FROM users");
+    if (parseInt(res.count) === 0) {
+        await dbWrapper.run(
             "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
             ['Админ', 'admin@finki.ukim.mk', 'admin123', 'admin']
         );
     }
 
-    return db;
+    console.log("Успешно поврзување со PostgreSQL базата.");
+    return dbWrapper;
 }
 
 module.exports = connectDB;

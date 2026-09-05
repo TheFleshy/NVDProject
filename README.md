@@ -1,4 +1,4 @@
-﻿# NVDProject
+﻿cd # NVDProject
 
 TERMINAL 1
 <br>

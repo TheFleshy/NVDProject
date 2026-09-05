@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import {LayoutDashboard, LogOut, Clock, Target, CheckCircle, UsersRound, Columns} from 'lucide-react';
+import {LayoutDashboard, LogOut,  Target,  UsersRound, Columns} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import './AdminDashboard.css';
 

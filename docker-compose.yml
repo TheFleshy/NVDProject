@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  nvd-database:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: supersecret
+      POSTGRES_DB: nvd_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - nvd_db_data:/var/lib/postgresql/data
+
+  nvd-backend:
+    build: ./server
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=nvd-database
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASS=supersecret
+      - DB_NAME=nvd_db
+    depends_on:
+      - nvd-database
+
+  nvd-frontend:
+    build: ./client
+    ports:
+      - "3000:3000"
+    depends_on:
+      - nvd-backend
+
+volumes:
+  nvd_db_data:
