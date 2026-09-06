@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: stojkovskiandrej/nvd-backend:24c5e4dcdf7a37d43b9473a63bf9622fcbaffd2f
+          image: stojkovskiandrej/nvd-backend:aece43e02bff6fd4669ee48ba7b70a8e4bb8c8d6
           ports:
             - containerPort: 5000
           env:
