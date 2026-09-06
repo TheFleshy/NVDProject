@@ -27,6 +27,6 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: stojkovskiandrej/nvd-frontend:latest
+          image: stojkovskiandrej/nvd-frontend:24c5e4dcdf7a37d43b9473a63bf9622fcbaffd2f
           ports:
             - containerPort: 3000
