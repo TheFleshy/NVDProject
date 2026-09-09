@@ -4,9 +4,9 @@ services:
   nvd-database:
     image: postgres:15-alpine
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: supersecret
-      POSTGRES_DB: nvd_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -19,9 +19,9 @@ services:
     environment:
       - DB_HOST=nvd-database
       - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASS=supersecret
-      - DB_NAME=nvd_db
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASS=${POSTGRES_PASSWORD}
+      - DB_NAME=${POSTGRES_DB}
     depends_on:
       - nvd-database
 
