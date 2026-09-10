@@ -13,25 +13,7 @@ const adaptSql = (sql) => {
     return sql.replace(/\?/g, () => `$${i++}`);
 };
 
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-async function waitForDB(retries = 10, delayMs = 2000) {
-    for (let attempt = 1; attempt <= retries; attempt++) {
-        try {
-            await pool.query('SELECT 1');
-            console.log("Базата е достапна.");
-            return;
-        } catch (err) {
-            console.log(`Обид ${attempt}/${retries}: базата сеуште не е достапна (${err.code || err.message}). Чекам ${delayMs / 1000}s...`);
-            await sleep(delayMs);
-        }
-    }
-    throw new Error("Базата не стана достапна по повеќе обиди.");
-}
-
 async function connectDB() {
-    await waitForDB();
-
     await pool.query(`
         CREATE TABLE IF NOT EXISTS users
         (
@@ -86,8 +68,6 @@ async function connectDB() {
             const res = await pool.query(adaptSql(sql), params);
             return res.rows[0];
         },
-        // run() враќа { lastID, rowCount } за да наликува на SQLite API-то
-        // Секој INSERT каде ти треба lastID мора да завршува со "RETURNING id"
         run: async (sql, params = []) => {
             const res = await pool.query(adaptSql(sql), params);
             return {
