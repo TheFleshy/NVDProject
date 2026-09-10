@@ -24,7 +24,7 @@ const RoleManagement = () => {
 
     const fetchUsers = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/users');
+            const res = await axios.get('/api/users');
             setUsers(res.data);
         } catch (error) {
             console.error("Грешка при влечење корисници", error);
@@ -34,7 +34,7 @@ const RoleManagement = () => {
     // НОВО: Влечење тимови
     const fetchTeams = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/teams');
+            const res = await axios.get('/api/teams');
             setTeams(res.data);
         } catch (error) {
             console.error("Грешка при влечење тимови", error);
@@ -43,7 +43,7 @@ const RoleManagement = () => {
 
     const handleRoleChange = async (userId, newRole) => {
         try {
-            await axios.put(`http://localhost:5000/api/users/${userId}/role`, {role: newRole});
+            await axios.put(`/api/users/${userId}/role`, {role: newRole});
             fetchUsers();
         } catch (error) {
             console.error("Грешка при промена на улога", error);
@@ -53,7 +53,7 @@ const RoleManagement = () => {
     // НОВО: Промена на тим на корисник
     const handleTeamChange = async (userId, newTeam) => {
         try {
-            await axios.put(`http://localhost:5000/api/users/${userId}/team`, {team_name: newTeam});
+            await axios.put(`/api/users/${userId}/team`, {team_name: newTeam});
             fetchUsers();
         } catch (error) {
             console.error("Грешка при промена на тим", error);
@@ -65,7 +65,7 @@ const RoleManagement = () => {
         e.preventDefault();
         if (!newTeamName) return;
         try {
-            await axios.post('http://localhost:5000/api/teams', {name: newTeamName});
+            await axios.post('/api/teams', {name: newTeamName});
             setNewTeamName('');
             fetchTeams(); // Освежи ја листата на тимови
         } catch (error) {
@@ -77,7 +77,7 @@ const RoleManagement = () => {
     const handleDeleteUser = async (userId, userName) => {
         if (window.confirm(`ВНИМАНИЕ: Дали сте сигурни дека сакате трајно да го избришете корисникот "${userName}"?`)) {
             try {
-                await axios.delete(`http://localhost:5000/api/users/${userId}`);
+                await axios.delete(`/api/users/${userId}`);
                 fetchUsers(); // Освежи ја листата веднаш
             } catch (error) {
                 alert(error.response?.data || "Грешка при бришење");
@@ -88,7 +88,7 @@ const RoleManagement = () => {
     const handleDeleteTeam = async (teamId, teamName) => {
         if (window.confirm(`Дали си сигурен дека сакаш да го избришеш тимот "${teamName}"? Сите негови членови ќе бидат вратени на "Без Тим".`)) {
             try {
-                await axios.delete(`http://localhost:5000/api/teams/${teamId}`);
+                await axios.delete(`/api/teams/${teamId}`);
                 fetchTeams(); // Освежи ја листата на тимови
                 fetchUsers(); // Освежи ги корисниците (затоа што некои изгубија тим)
             } catch (error) {

@@ -13,6 +13,10 @@ connectDB().then(async (database) => {
     console.log("Успешно поврзано со PostgreSQL базата!");
 }).catch(err => {
     console.error("Грешка при поврзување со базата:", err);
+    // Го "рушиме" процесот намерно - во Kubernetes ова ќе предизвика
+    // автоматски рестарт на pod-от (restartPolicy), се додека базата
+    // не стане достапна. Ова е стандардна k8s пракса наместо retry logic во кодот.
+    process.exit(1);
 });
 
 // --- РУТИ ЗА KANBAN КОЛОНИ ---

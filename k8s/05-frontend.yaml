@@ -30,3 +30,6 @@ spec:
           image: stojkovskiandrej/nvd-frontend:aece43e02bff6fd4669ee48ba7b70a8e4bb8c8d6
           ports:
             - containerPort: 3000
+          env:
+            - name: BACKEND_URL
+              value: "http://nvd-backend-svc:5000"

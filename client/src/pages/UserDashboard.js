@@ -13,11 +13,11 @@ const UserDashboard = () => {
 
     const fetchData = async () => {
         try {
-            const tasksRes = await axios.get('http://localhost:5000/api/tasks');
+            const tasksRes = await axios.get('/api/tasks');
             setTasks(tasksRes.data);
-            const usersRes = await axios.get('http://localhost:5000/api/users');
+            const usersRes = await axios.get('/api/users');
             setUsers(usersRes.data);
-            const colsRes = await axios.get('http://localhost:5000/api/columns');
+            const colsRes = await axios.get('/api/columns');
             setColumns(colsRes.data);
         } catch (error) {
             console.error("Грешка при влечење податоци:", error);
@@ -34,7 +34,7 @@ const UserDashboard = () => {
 
     const handleStatusChange = async (taskId, newStatus) => {
         try {
-            await axios.put(`http://localhost:5000/api/tasks/${taskId}`, {
+            await axios.put(`/api/tasks/${taskId}`, {
                 status: newStatus,
                 user_name: loggedInUser.name
             });

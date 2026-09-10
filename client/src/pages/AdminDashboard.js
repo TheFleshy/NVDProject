@@ -34,15 +34,15 @@ const AdminDashboard = () => {
 
     const fetchData = async () => {
         try {
-            const tasksRes = await axios.get('http://localhost:5000/api/tasks');
+            const tasksRes = await axios.get('/api/tasks');
             setTasks(tasksRes.data);
-            const logsRes = await axios.get('http://localhost:5000/api/activity-logs');
+            const logsRes = await axios.get('/api/activity-logs');
             setLogs(logsRes.data);
-            const usersRes = await axios.get('http://localhost:5000/api/users');
+            const usersRes = await axios.get('/api/users');
             setUsers(usersRes.data);
-            const teamsRes = await axios.get('http://localhost:5000/api/teams');
+            const teamsRes = await axios.get('/api/teams');
             setTeams(teamsRes.data);
-            const colsRes = await axios.get('http://localhost:5000/api/columns');
+            const colsRes = await axios.get('/api/columns');
             setColumns(colsRes.data);
         } catch (error) {
             console.error("Грешка при влечење податоци:", error);
@@ -57,7 +57,7 @@ const AdminDashboard = () => {
         e.preventDefault();
         if (!title || !assignedTo) return;
         try {
-            await axios.post('http://localhost:5000/api/tasks', {
+            await axios.post('/api/tasks', {
                 title, description, assigned_to: assignedTo, created_by: loggedInUser.name
             });
             setTitle('');
@@ -73,7 +73,7 @@ const AdminDashboard = () => {
         e.preventDefault();
         if (!newColumnName) return;
         try {
-            await axios.post('http://localhost:5000/api/columns', {name: newColumnName});
+            await axios.post('/api/columns', {name: newColumnName});
             setNewColumnName('');
             fetchData();
             alert("Успешно додадена нова Kanban колона!");
@@ -90,7 +90,7 @@ const AdminDashboard = () => {
 
         if (window.confirm(`Дали сте сигурни дека сакате да ја избришете колоната "${colName}"? Сите задачи што се во неа автоматски ќе бидат вратени во "TODO".`)) {
             try {
-                await axios.delete(`http://localhost:5000/api/columns/${colId}`);
+                await axios.delete(`/api/columns/${colId}`);
                 fetchData(); // Освежи за да се тргне колоната и да се преместат задачите
             } catch (error) {
                 alert(error.response?.data || "Грешка при бришење колона");
@@ -101,7 +101,7 @@ const AdminDashboard = () => {
     const handleDeleteTask = async (id) => {
         if (window.confirm("Дали сте сигурни дека сакате да ја избришете оваа задача?")) {
             try {
-                await axios.delete(`http://localhost:5000/api/tasks/${id}`);
+                await axios.delete(`/api/tasks/${id}`);
                 fetchData();
             } catch (error) {
                 console.error("Грешка:", error);
@@ -111,7 +111,7 @@ const AdminDashboard = () => {
 
     const handleStatusChange = async (taskId, newStatus) => {
         try {
-            await axios.put(`http://localhost:5000/api/tasks/${taskId}`, {
+            await axios.put(`/api/tasks/${taskId}`, {
                 status: newStatus, user_name: loggedInUser.name
             });
             fetchData();
