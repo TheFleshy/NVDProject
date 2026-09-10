@@ -10,48 +10,19 @@ let db;
 
 connectDB().then(async (database) => {
     db = database;
-    console.log("Успешно поврзано со SQLite базата!");
-
-    // --- НОВО: Креирање табела за динамични Kanban колони ---
-    try {
-        await db.run(`
-            CREATE TABLE IF NOT EXISTS kanban_columns
-            (
-                id
-                INTEGER
-                PRIMARY
-                KEY
-                AUTOINCREMENT,
-                name
-                TEXT
-                UNIQUE,
-                status_value
-                TEXT
-                UNIQUE
-            )
-        `);
-
-        // Проверка дали има колони, ако нема стави ги основните 3
-        const colCount = await db.get('SELECT count(*) as count FROM kanban_columns');
-        if (colCount.count === 0) {
-            await db.run("INSERT INTO kanban_columns (name, status_value) VALUES ('TODO', 'todo'), ('IN PROGRESS', 'in_progress'), ('DONE', 'done')");
-            console.log("Креирани се основните 3 Kanban колони.");
-        }
-    } catch (err) {
-        console.error("Грешка при сетирање на колоните:", err);
-    }
-
+    console.log("Успешно поврзано со PostgreSQL базата!");
 }).catch(err => {
     console.error("Грешка при поврзување со базата:", err);
 });
 
-// --- НОВИ РУТИ ЗА KANBAN КОЛОНИ ---
+// --- РУТИ ЗА KANBAN КОЛОНИ ---
 
 app.get('/api/columns', async (req, res) => {
     try {
         const columns = await db.all('SELECT * FROM kanban_columns ORDER BY id ASC');
         res.json(columns);
     } catch (err) {
+        console.error(err);
         res.status(500).send('Грешка при влечење колони');
     }
 });
@@ -65,7 +36,11 @@ app.post('/api/columns', async (req, res) => {
         await db.run('INSERT INTO kanban_columns (name, status_value) VALUES (?, ?)', [name, status_value]);
         res.status(201).json({message: 'Колоната е успешно додадена!'});
     } catch (err) {
-        res.status(500).send('Грешка при креирање колона (можеби името веќе постои).');
+        console.error(err);
+        if (err.code === '23505') {
+            return res.status(400).send('Колона со ова име веќе постои.');
+        }
+        res.status(500).send('Грешка при креирање колона');
     }
 });
 
@@ -88,6 +63,7 @@ app.delete('/api/columns/:id', async (req, res) => {
         await db.run('DELETE FROM kanban_columns WHERE id = ?', [id]);
         res.json({message: 'Колоната е избришана, задачите се преместени во TODO!'});
     } catch (err) {
+        console.error(err);
         res.status(500).send('Грешка при бришење на колоната');
     }
 });
@@ -100,6 +76,7 @@ app.get('/api/tasks', async (req, res) => {
         const rows = await db.all('SELECT * FROM tasks ORDER BY id DESC');
         res.json(rows);
     } catch (err) {
+        console.error(err);
         res.status(500).send('Серверска грешка');
     }
 });
@@ -108,7 +85,7 @@ app.post('/api/tasks', async (req, res) => {
     const {title, description, assigned_to, created_by} = req.body;
     try {
         const result = await db.run(
-            'INSERT INTO tasks (title, description, assigned_to) VALUES (?, ?, ?)',
+            'INSERT INTO tasks (title, description, assigned_to) VALUES (?, ?, ?) RETURNING id',
             [title, description, assigned_to]
         );
         await db.run(
@@ -117,6 +94,7 @@ app.post('/api/tasks', async (req, res) => {
         );
         res.json({message: 'Задачата е успешно креирана!', taskId: result.lastID});
     } catch (err) {
+        console.error(err);
         res.status(500).send('Серверска грешка');
     }
 });
@@ -135,6 +113,7 @@ app.put('/api/tasks/:id', async (req, res) => {
         );
         res.json({message: 'Статусот е ажуриран и промената е запишана!'});
     } catch (err) {
+        console.error(err);
         res.status(500).send('Серверска грешка');
     }
 });
@@ -153,6 +132,7 @@ app.delete('/api/tasks/:id', async (req, res) => {
         );
         res.json({message: 'Задачата е избришана!'});
     } catch (err) {
+        console.error(err);
         res.status(500).send('Серверска грешка');
     }
 });
@@ -162,6 +142,7 @@ app.get('/api/activity-logs', async (req, res) => {
         const logs = await db.all('SELECT * FROM activity_logs ORDER BY created_at DESC');
         res.json(logs);
     } catch (err) {
+        console.error(err);
         res.status(500).send('Серверска грешка');
     }
 });
@@ -172,12 +153,13 @@ app.post('/api/register', async (req, res) => {
     const {name, email, password} = req.body;
     try {
         const result = await db.run(
-            'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+            'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?) RETURNING id',
             [name, email, password, 'user']
         );
         res.status(201).json({message: 'Корисникот е успешно креиран!', id: result.lastID});
     } catch (err) {
-        if (err.message && err.message.includes('UNIQUE constraint failed')) {
+        console.error(err);
+        if (err.code === '23505') {
             return res.status(400).send('Овој е-маил веќе постои во системот.');
         }
         res.status(500).send('Серверска грешка при регистрација');
@@ -193,6 +175,7 @@ app.post('/api/login', async (req, res) => {
         }
         res.json({id: user.id, name: user.name, email: user.email, role: user.role});
     } catch (err) {
+        console.error(err);
         res.status(500).send('Серверска грешка при најава');
     }
 });
@@ -204,6 +187,7 @@ app.put('/api/users/:id/role', async (req, res) => {
         await db.run('UPDATE users SET role = ? WHERE id = ?', [role, id]);
         res.json({message: 'Улогата е успешно ажурирана!'});
     } catch (err) {
+        console.error(err);
         res.status(500).send('Грешка при ажурирање на улога');
     }
 });
@@ -213,10 +197,11 @@ app.put('/api/users/:id/role', async (req, res) => {
 app.post('/api/teams', async (req, res) => {
     const {name} = req.body;
     try {
-        const result = await db.run('INSERT INTO teams (name) VALUES (?)', [name]);
+        const result = await db.run('INSERT INTO teams (name) VALUES (?) RETURNING id', [name]);
         res.json({message: 'Тимот е успешно креиран!', id: result.lastID});
     } catch (err) {
-        if (err.message.includes('UNIQUE')) {
+        console.error(err);
+        if (err.code === '23505') {
             return res.status(400).send('Ова име на тим веќе постои.');
         }
         res.status(500).send('Грешка при креирање тим');
@@ -228,6 +213,7 @@ app.get('/api/teams', async (req, res) => {
         const teams = await db.all('SELECT * FROM teams');
         res.json(teams);
     } catch (err) {
+        console.error(err);
         res.status(500).send('Грешка при влечење тимови');
     }
 });
@@ -239,6 +225,7 @@ app.put('/api/users/:id/team', async (req, res) => {
         await db.run('UPDATE users SET team_name = ? WHERE id = ?', [team_name, id]);
         res.json({message: 'Корисникот е додаден во тимот!'});
     } catch (err) {
+        console.error(err);
         res.status(500).send('Грешка при ажурирање тим на корисник');
     }
 });
@@ -254,6 +241,7 @@ app.delete('/api/teams/:id', async (req, res) => {
 
         res.json({message: 'Тимот е избришан и корисниците се ажурирани!'});
     } catch (err) {
+        console.error(err);
         res.status(500).send('Грешка при бришење на тим');
     }
 });
@@ -263,11 +251,12 @@ app.get('/api/users', async (req, res) => {
         const users = await db.all('SELECT id, name, email, role, team_name FROM users');
         res.json(users);
     } catch (err) {
+        console.error(err);
         res.status(500).send('Грешка при влечење корисници');
     }
 });
 
-// 14. Избриши корисник (Само Главен Админ)
+// Избриши корисник (Само Главен Админ)
 app.delete('/api/users/:id', async (req, res) => {
     const {id} = req.params;
     try {
@@ -279,6 +268,7 @@ app.delete('/api/users/:id', async (req, res) => {
         await db.run('DELETE FROM users WHERE id = ?', [id]);
         res.json({message: 'Корисникот е успешно избришан!'});
     } catch (err) {
+        console.error(err);
         res.status(500).send('Грешка при бришење на корисник');
     }
 });
